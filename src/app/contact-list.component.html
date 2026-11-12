@@ -1,0 +1,39 @@
+<div class="workspace-heading">
+  <div><h2>Ваши контакты <span class="count">{{ contacts().length }}</span></h2><p>Найдите контакт или добавьте новый.</p></div>
+  <button class="btn btn-primary" type="button" (click)="createNew()" [disabled]="busy()">+ Новый контакт</button>
+</div>
+@if (message()) { <div class="notice notice-success" role="status">{{ message() }}</div> }
+@if (error()) { <div class="notice notice-error" role="alert">{{ error() }}</div> }
+<div class="workspace">
+  <section class="contact-panel" aria-label="Список контактов">
+    <div class="search-wrap">
+      <label for="contact-search" class="visually-hidden">Поиск контактов</label>
+      <input id="contact-search" class="form-control" type="search" placeholder="Поиск по имени, почте или телефону" [value]="query()" (input)="query.set($any($event.target).value)">
+    </div>
+    @if (loading()) {
+      <div class="panel-empty" role="status">Загрузка контактов…</div>
+    } @else {
+      <ul class="contact-list">
+        @for (contact of filtered(); track contact._id) {
+          <li>
+            <button type="button" class="contact-row" [class.selected]="selected()?._id === contact._id" [disabled]="busy()" (click)="choose(contact)" [attr.aria-pressed]="selected()?._id === contact._id">
+              <span class="avatar" aria-hidden="true">{{ contact.username.charAt(0).toUpperCase() }}</span>
+              <span class="contact-copy"><strong>{{ contact.username }}</strong><span>{{ contact.telephone.mobile || contact.telephone.home }}</span></span>
+              <span class="row-arrow" aria-hidden="true">›</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="panel-empty">{{ query() ? 'Ничего не найдено. Попробуйте другой запрос.' : 'Пока нет контактов. Добавьте первый.' }}</li>
+        }
+      </ul>
+    }
+    @if (!loading() && error()) { <button type="button" class="btn btn-link" (click)="load()">Обновить список</button> }
+  </section>
+  <section class="details-panel" aria-label="Данные контакта">
+    @if (selected()) {
+      <app-contact-details [contact]="selected()!" [busy]="busy()" (save)="save($event)" (remove)="remove($event)" (cancel)="cancel()" />
+    } @else {
+      <div class="detail-empty"><span class="empty-symbol" aria-hidden="true">✆</span><h3>Выберите контакт</h3><p>Откройте запись из списка, чтобы посмотреть<br>и изменить данные, или создайте новую.</p><button class="btn btn-outline-primary" type="button" (click)="createNew()">Добавить контакт</button></div>
+    }
+  </section>
+</div>

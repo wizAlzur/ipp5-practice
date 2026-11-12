@@ -1,0 +1,30 @@
+<div class="detail-heading"><p class="eyebrow">{{ draft._id ? 'КАРТОЧКА КОНТАКТА' : 'НОВАЯ ЗАПИСЬ' }}</p><h3>{{ draft._id ? draft.username : 'Добавить контакт' }}</h3></div>
+<form #form="ngForm" (ngSubmit)="save.emit(draft)" class="contact-form">
+  <fieldset [disabled]="busy">
+    <div class="mb-4">
+      <label class="form-label" for="username">Имя <span class="required">*</span></label>
+      <input id="username" name="username" class="form-control" [(ngModel)]="draft.username" required maxlength="100" placeholder="Например, Анна Смирнова" autocomplete="name">
+    </div>
+    <div class="mb-4">
+      <label class="form-label" for="email">Электронная почта</label>
+      <input id="email" name="email" class="form-control" type="email" [(ngModel)]="draft.email" email maxlength="254" placeholder="name@example.test" autocomplete="email">
+    </div>
+    <div class="phone-fields">
+      <div><label class="form-label" for="mobile">Мобильный телефон</label><input id="mobile" name="mobile" class="form-control" type="tel" [(ngModel)]="draft.telephone.mobile" maxlength="40" placeholder="+7 (900) 000-00-01" autocomplete="tel"></div>
+      <div><label class="form-label" for="home">Домашний телефон</label><input id="home" name="home" class="form-control" type="tel" [(ngModel)]="draft.telephone.home" maxlength="40" placeholder="+7 (495) 000-00-01"></div>
+    </div>
+    <p class="field-note">Укажите имя и хотя бы один номер телефона.</p>
+    <div class="form-actions">
+      <button class="btn btn-primary" type="submit" [disabled]="form.invalid || !draft.username.trim() || (!draft.telephone.mobile.trim() && !draft.telephone.home.trim())">{{ busy ? 'Сохранение…' : draft._id ? 'Сохранить изменения' : 'Создать контакт' }}</button>
+      <button class="btn btn-light" type="button" (click)="cancel.emit()">Отмена</button>
+    </div>
+    @if (draft._id) {
+      <div class="contact-meta"><span>ID контакта</span><code>{{ draft._id }}</code></div>
+      @if (!confirmingDelete) {
+        <button class="delete-link" type="button" (click)="confirmingDelete = true">Удалить контакт</button>
+      } @else {
+        <div class="delete-confirm" role="alert"><p>Удалить контакт «{{ contact.username }}»?</p><button class="btn btn-danger btn-sm" type="button" (click)="remove.emit(draft._id!)">Да, удалить</button><button class="btn btn-light btn-sm" type="button" (click)="confirmingDelete = false">Оставить</button></div>
+      }
+    }
+  </fieldset>
+</form>
